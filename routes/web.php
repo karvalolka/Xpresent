@@ -20,10 +20,6 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
 Route::middleware('auth')->prefix('transaction')->group(function () {
     Route::get('/', [TransactionController::class, '__invoke'])->name('transactions.index');
     Route::get('/create', [CreateTransactionController::class, '__invoke'])->name('transactions.create');

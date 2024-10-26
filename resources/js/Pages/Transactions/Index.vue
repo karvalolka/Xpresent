@@ -3,6 +3,20 @@
         <h1>Транзакции</h1>
         <a class="btn" href="/transaction/create">Добавить транзакцию</a>
 
+        <div class="filter">
+            <label for="startDate">С начала:</label>
+            <input type="date" v-model="startDate" @change="filterTransactions" />
+            <label for="endDate">По конец:</label>
+            <input type="date" v-model="endDate" @change="filterTransactions" />
+            <button @click="filterTransactions">Применить</button>
+        </div>
+
+        <div class="summary">
+            <h2>Итого</h2>
+            <p>Доходы: {{ totalIncome }} руб.</p>
+            <p>Расходы: {{ totalExpense }} руб.</p>
+        </div>
+
         <table>
             <thead>
             <tr>
@@ -14,7 +28,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr v-for="transaction in transactions" :key="transaction.id">
+            <tr v-for="transaction in filteredTransactions" :key="transaction.id">
                 <td>{{ transaction.category }}</td>
                 <td>{{ transaction.amount }}</td>
                 <td>{{ transaction.date }}</td>
@@ -36,12 +50,40 @@ export default {
     props: {
         transactions: Array,
     },
+    data() {
+        return {
+            startDate: '',
+            endDate: '',
+            filteredTransactions: this.transactions,
+        };
+    },
+    computed: {
+        totalIncome() {
+            return this.filteredTransactions.filter(t => t.category === 'income').reduce((sum, t) => sum + t.amount, 0);
+        },
+        totalExpense() {
+            return this.filteredTransactions.filter(t => t.category === 'expense').reduce((sum, t) => sum + t.amount, 0);
+        },
+    },
     methods: {
         async destroy(id) {
             if (confirm('Вы уверены, что хотите удалить эту транзакцию?')) {
                 await this.$inertia.delete(`/transaction/${id}`);
+                this.filteredTransactions = this.filteredTransactions.filter(transaction => transaction.id !== id);
             }
         },
+        filterTransactions() {
+            const start = this.startDate ? new Date(this.startDate) : null;
+            const end = this.endDate ? new Date(this.endDate) : null;
+
+            this.filteredTransactions = this.transactions.filter(transaction => {
+                const transactionDate = new Date(transaction.date);
+                return (!start || transactionDate >= start) && (!end || transactionDate <= end);
+            });
+        },
+    },
+    mounted() {
+        this.filteredTransactions = this.transactions;
     },
 };
 </script>
@@ -52,14 +94,14 @@ export default {
 }
 
 .btn {
-    margin-top: 20px; /* Увеличиваем отступ сверху */
-    margin-bottom: 20px; /* Увеличиваем отступ снизу */
+    margin-top: 20px;
+    margin-bottom: 20px;
     padding: 10px 15px;
     background-color: #4CAF50;
     color: white;
     text-decoration: none;
     border-radius: 5px;
-    display: inline-block; /* Чтобы кнопка воспринималась как блок */
+    display: inline-block;
 }
 
 .btn-edit {
@@ -72,6 +114,17 @@ export default {
     color: white;
     border: none;
     padding: 5px 10px;
+    border-radius: 5px;
+}
+
+.filter {
+    margin-bottom: 20px;
+}
+
+.summary {
+    margin-bottom: 20px;
+    background-color: #e9ecef;
+    padding: 10px;
     border-radius: 5px;
 }
 
@@ -90,4 +143,3 @@ th {
     background-color: #f2f2f2;
 }
 </style>
-
