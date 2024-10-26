@@ -4,17 +4,21 @@
         <a class="btn" href="/transaction/create">Добавить транзакцию</a>
 
         <div class="filter">
-            <label for="startDate">С начала:</label>
-            <input type="date" v-model="startDate" @change="filterTransactions" />
-            <label for="endDate">По конец:</label>
-            <input type="date" v-model="endDate" @change="filterTransactions" />
-            <button @click="filterTransactions">Применить</button>
+            <div class="filter-group">
+                <label for="startDate">С начала:</label>
+                <input type="date" v-model="startDate" @change="filterTransactions" />
+            </div>
+            <div class="filter-group">
+                <label for="endDate">По конец:</label>
+                <input type="date" v-model="endDate" @change="filterTransactions" />
+            </div>
+            <button @click="filterTransactions" class="btn-filter">Применить</button>
         </div>
 
         <div class="summary">
             <h2>Итого</h2>
-            <p>Доходы: {{ totalIncome }} руб.</p>
-            <p>Расходы: {{ totalExpense }} руб.</p>
+            <p class="income">Доходы: {{ totalIncome }} руб.</p>
+            <p class="expense">Расходы: {{ totalExpense }} руб.</p>
         </div>
 
         <table>
@@ -34,10 +38,12 @@
                 <td>{{ transaction.date }}</td>
                 <td>{{ transaction.description }}</td>
                 <td>
-                    <a class="btn-edit" :href="`/transaction/${transaction.id}/edit`">Редактировать</a>
-                    <form @submit.prevent="destroy(transaction.id)" class="form-delete">
-                        <button type="submit" class="btn-delete">Удалить</button>
-                    </form>
+                    <div class="action-buttons">
+                        <a class="btn-edit" :href="`/transaction/${transaction.id}/edit`">Редактировать</a>
+                        <form @submit.prevent="destroy(transaction.id)" class="form-delete">
+                            <button type="submit" class="btn-delete">Удалить</button>
+                        </form>
+                    </div>
                 </td>
             </tr>
             </tbody>
@@ -91,6 +97,9 @@ export default {
 <style scoped>
 .transaction-list {
     padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .btn {
@@ -102,11 +111,38 @@ export default {
     text-decoration: none;
     border-radius: 5px;
     display: inline-block;
+    transition: background-color 0.3s;
+}
+
+.btn:hover {
+    background-color: #45a049;
+}
+
+.btn-filter {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-filter:hover {
+    background-color: #0056b3;
 }
 
 .btn-edit {
-    margin-right: 5px;
-    background-color: #2196F3;
+    margin-right: 15px;
+    background-color: #ffc107;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.btn-edit:hover {
+    background-color: #e0a800;
 }
 
 .btn-delete {
@@ -117,8 +153,18 @@ export default {
     border-radius: 5px;
 }
 
+.btn-delete:hover {
+    background-color: #d32f2f;
+}
+
 .filter {
-    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.filter-group {
+    margin-right: 20px;
 }
 
 .summary {
@@ -126,6 +172,16 @@ export default {
     background-color: #e9ecef;
     padding: 10px;
     border-radius: 5px;
+}
+
+.income {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.expense {
+    color: #dc3545;
+    font-weight: bold;
 }
 
 table {
@@ -141,5 +197,10 @@ th, td {
 
 th {
     background-color: #f2f2f2;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
 }
 </style>
